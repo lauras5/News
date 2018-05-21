@@ -1,0 +1,30 @@
+{
+  "name": "news",
+  "version": "1.0.0",
+  "description": "App uses Mongoose and Cheerio to scrape news website",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lauras5/News.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lauras5/News/issues"
+  },
+  "homepage": "https://github.com/lauras5/News#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.3",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^5.1.1",
+    "morgan": "^1.9.0",
+    "request": "^2.87.0"
+  }
+}
