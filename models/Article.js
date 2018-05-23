@@ -6,13 +6,21 @@ var ArticleSchema = new Schema ({
         type: String,
         require: true
     },
-    summary : {
+    body : {
         type : String,
         required : true
     },
     url : {
         type : String,
         required : true
+    },
+    author : {
+        type : String,
+        require : true
+    },
+    saved : {
+        type : Boolean,
+        default : false
     },
     note : [{
         type : Schema.Types.ObjectId,

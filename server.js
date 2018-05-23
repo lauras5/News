@@ -1,74 +1,32 @@
 // dependencies
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+const express = require('express');
+const app = express();
 
+const bodyParser = require('body-parser');
+
+const mongoose = require('mongoose');
+mongoose.connect("mongodb://localhost/news-scraper");
 // requires all models in models folder
-var db = require('./models');
+const exphbs = require('express-handlebars');
+// var db = require('./models');
+const articleModel = require('./models/Article.js');
+const noteModel = require('./models/Note.js');
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/news-scraper");
 
-var app = express();
+const request = require('request');
+const cheerio = require('cheerio');
+// mongoose.Promise = Promise;
 
-var request = require('request');
-var cheerio = require('cheerio');
-mongoose.Promise = Promise;
+app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
+app.set("view engine", ".hbs");
 
 // handle form submissions 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-var exphbs = require('express-handlebars');
-
-app.engine("handlebars", exphbs({ defaultLayout: "main" }));
-app.set("view engine", "hbs");
-
-app.get('/newsfeed', function(req, res) {
-    request('http://time.com/section/tech/', function(err, res, html) {
-        var $ = cheerio.load(html);
-
-        $('article.partial.tile.media.image-top.type-article').each(function(i, element) {
-            var title = $(element).children('.headline').text();
-        })
-    })
-    console.log(title)
-});
-
-app.post('/newsfeed/new', function(req, res) {
-
-});
-
-
-app.get('/notes', function(req, res) {
-
-});
-app.post('/notes/new', function(req, res) {
-
-});
-
-
-app.listen(3000, function(e) {
+app.listen(3000, (e) => {
     if (e) throw e;
-    console.log('Listening on Port 3000')
+    console.log('MongoDB Scrapper listening on Port 3000')
 });
 
-// request('http://time.com/section/tech/', function (e, r, html) {
-//     if (e) throw e;
-
-//     var $ = cheerio.load(html)
-//     var results = [];
-
-//     $('div.headline').each(function (i, element) {
-//         var title = $(element).text()
-//         var url = $(element).children().attr('href');
-
-//         results.push({
-//             title: title,
-//             url: url
-//         })
-
-//     })
-
-//     console.log(results)
-// })
