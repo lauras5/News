@@ -5,12 +5,12 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-const Article = require('./models/Article.js');
-const Note = require('./models/Note.js');
-
+// const Article = require('./models/Article.js');
+// const Note = require('./models/Note.js');
+const db = require('./models')
 const app = express();
-
-mongoose.Promise = Promise;
+const Article = db.Article
+const Note = db.Note
 
 // initialize express
 
@@ -25,35 +25,52 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
 app.set("view engine", "hbs");
 
-mongoose.connect("mongodb://localhost/newsdb");
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
 
-const db = mongoose.connection;
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
 
-db.on("error", function (error) {
-    console.log("Mongoose Error: ", error);
-});
-
-db.once("open", function () {
-    console.log("Mongoose connection successful.");
-});
-
-// routes
+// class way 
 app.get('/', (req, res) => {
     res.render('index')
 });
 
-// route to saved articles
-app.get('/savedArticles', (req, res) => {
-    Article.find({saved : true}, (err, data) => {
-        if (err) throw err;
-        const hbsArticle =
-            {
-                articles: data
-            }
-        res.render('savedArticles', hbsArticle);
+// sort by newest
+app.get('/newsarticles', (req, res) => {
+    Article.find({}).then(function (r) {
+        res.render('newsfeed', { article: r })
+    }).catch(function (e) {
+        res.send(e)
     })
 })
 
+// // mongoose connection
+// const db = mongoose.connection;
+
+// db.on("error", function (error) {
+//     console.log("Mongoose Error: ", error);
+// });
+
+// db.once("open", function () {
+//     console.log("Mongoose connection successful.");
+// });
+
+// route to saved articles
+app.get('/savedArticles', (req, res) => {
+    Article.find({ saved: true }).then(function (r) {
+        res.render('savedArticles', { sarticle: r })
+    }).catch(function (e) {
+        res.send(e)
+    })
+});
+
+app.post('/saved/:id', (req, res) => {
+    Article.update({_id : id}).then(function (r) {
+        res.json(r)
+    })
+})
 
 app.post('/scrape', (req, res) => {
     const scrapedUrl = 'https://www.cnet.com/news/'
@@ -77,7 +94,7 @@ app.post('/scrape', (req, res) => {
             const url = r.find('a').attr('href');
             const author = r.find('.assetAuthor').text()
 
-            if (title && body && url && author) {
+            if (title && body && url && author && unique) {
                 const articleObj = new Article({
                     title: title,
                     body: body,
@@ -88,22 +105,14 @@ app.post('/scrape', (req, res) => {
 
                 console.log(articleObj.body);
 
+                // add if statement for repeats
                 articleObj.save((err) => {
                     if (err) throw err;
                 })
-
-                // articleObj.push({
-                //     title: title,
-                //     body: body,
-                //     url: 'https://www.cnet.com/news' + url,
-                //     author: author,
-                //     saved: false
-                // });
-
-            } else { console.log('nope') }
+            }
         });
     });
-})
+});
 
 app.listen(3000, (err) => {
     if (err) throw err;

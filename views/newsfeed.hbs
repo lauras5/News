@@ -1,12 +1,45 @@
-{{#each article}}
-<p>Title : {{ title }}</p>
-<p>Body : {{body}}</p>
-<p>url : {{url}}</p>
-<p>author : {{author}}</p>
-{{/each}}
+<div id='news_block'>
+    <ul id='navbar' class="nav">
+        <li class="nav-item">
+            <a id='btns' class="nav-link active" href="/newsarticles">Newsfeed</a>
+        </li>
+        <li class="nav-item">
+            <a id='btns' class="nav-link" href="/savedArticles">Saved Articles</a>
+        </li>
+    </ul>
+    <div class="container">
+        <div class="row">
+            <div class="col-md">
+                <div id='jumbo' class="jumbotron">
+                    <h1>News Articles from CNET</h1>
+                </div>
+            </div>
+        </div>
 
-<p>hello test</p>
+            {{!-- <div class="col-md-4"> --}}
+            {{#each article}}
 
-<button>
-    <a class="btn btn-lg btn-success" href="/savedArticles" role="button">My Saved Articles</a>
-</button>
+                <div id="news_each">
+                    <h3 id='title'>{{ title }}</h3>
+                    <p id='body'>{{body}}</p>
+                    <p id='author'>Written {{author}}</p>
+
+                    <button id='linkBtn' class="btn btn-dark">
+                        <a id='btns' href={{url}} target='_blank'> GO TO ARTICLE </a>
+                    </button>
+
+                    <button id='noteBtn' class="btn btn-dark">
+                        <a id='btns' href="/note/:" + {{this._id}}>Add a Comment</a>
+                    </button>
+
+                    <button id='saveBtn' class="btn btn-dark">
+                        <a id='btns' href='#'>Save This Article</a>
+                    </button>
+                </div>
+            {{/each}}
+            {{!-- </div> --}}
+        </div>
+        <br>
+    </div>
+</div>
+</div>
