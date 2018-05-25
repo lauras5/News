@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
 app.set("view engine", "hbs");
 
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://<dbuser>:<dbpassword>@ds135619.mlab.com:35619/heroku_vzk22r8w";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -113,7 +113,7 @@ app.post('/scrape', (req, res) => {
                     })
                 }; 
             };
-
+            
         });
     });
     res.redirect('/newsarticles')
