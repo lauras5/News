@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 
 // sort by newest
 app.get('/newsarticles', (req, res) => {
-    Article.find({}).then(function (r) {
+    Article.find({saved : false}).then(function (r) {
         res.render('newsfeed', { article: r })
     }).catch(function (e) {
         res.send(e)
@@ -59,12 +59,6 @@ app.get('/newsarticles', (req, res) => {
 
 // route to saved articles
 
-app.post('/saved/:id', (req, res) => {
-    Article.update({ _id: id }).then(function (r) {
-        res.json(r)
-    })
-})
-
 app.get('/savedArticles', (req, res) => {
     Article.find({ saved: true }).then(function (r) {
         res.render('savedArticles', { sarticle: r })
@@ -72,6 +66,15 @@ app.get('/savedArticles', (req, res) => {
         res.send(e)
     });
 });
+
+app.post('/saved/:id', (req, res) => {
+    Article.update({ _id: req.params.id }, {saved : true}, (err, doc) =>{
+        if (err) throw err
+        return res.send('successfully updated')
+    });
+    res.redirect('/savedArticles')
+})
+
 
 app.post('/scrape', (req, res) => {
     const scrapedUrl = 'https://www.cnet.com/news/'
@@ -120,6 +123,7 @@ app.post('/scrape', (req, res) => {
 });
 
 // save post
+
 app.put('/note/:id', (req, res) => {
     console.log(req.body.noteText) // returns note
     // let text = req.body.noteText
