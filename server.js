@@ -26,39 +26,25 @@ app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
 app.set("view engine", "hbs");
 
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
-// var MONGODB_URI = process.env.MONGODB_URI || 'mongodb://<dbuser>:<dbpassword>@ds135619.mlab.com:35619/heroku_vzk22r8w' || 'mongodb://localhost/newsdb'
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
-// Connect to the Mongo DB
 mongoose.Promise = Promise;
+// Connect to the Mongo DB
 mongoose.connect(MONGODB_URI);
 
-// class way 
+// render index page
 app.get('/', (req, res) => {
     res.render('index')
 });
 
 // sort by newest
 app.get('/newsarticles', (req, res) => {
-    Article.find({saved : false}).then(function (r) {
+    Article.find({ saved: false }).then(function (r) {
         res.render('newsfeed', { article: r })
     }).catch(function (e) {
         res.send(e)
     })
 })
-
-// // mongoose connection
-// const db = mongoose.connection;
-
-// db.on("error", function (error) {
-//     console.log("Mongoose Error: ", error);
-// });
-
-// db.once("open", function () {
-//     console.log("Mongoose connection successful.");
-// });
-
-// route to saved articles
 
 app.get('/savedArticles', (req, res) => {
     Article.find({ saved: true }).then(function (r) {
@@ -69,18 +55,38 @@ app.get('/savedArticles', (req, res) => {
 });
 
 app.post('/saved/:id', (req, res) => {
-    Article.update({ _id: req.params.id }, {saved : true}, (err, doc) =>{
+    Article.update({ _id: req.params.id }, { saved: true }, (err, doc) => {
         if (err) throw err
         return res.redirect('/newsarticles')
     });
 })
 
 app.post('/unsaved/:id', (req, res) => {
-    Article.update({ _id: req.params.id }, {saved : false}, (err, doc) =>{
+    Article.update({ _id: req.params.id }, { saved: false }, (err, doc) => {
         if (err) throw err
         return res.redirect('/savedArticles')
     });
 })
+
+app.post('/note/:id', (req, res) => {
+    console.log(req.body.noteText) // returns note
+    // let text = req.body.noteText
+    const note = new Note({
+        note: req.body.noteText
+    });
+
+    note.save((err) => {
+        if (err) throw err
+    })
+
+    Article.update({ _id: req.params.id }, {
+        '$push': { note }
+    }, (err, doc) => {
+        // console.log(doc)
+        if (err) throw err;
+        return res.redirect('/newsarticles')
+    });
+});
 
 
 app.post('/scrape', (req, res) => {
@@ -114,35 +120,22 @@ app.post('/scrape', (req, res) => {
                     saved: false
                 });
 
-                console.log(articleObj.title);
-                console.log(Article.title)
-                // add if statement for repeats
-                if (articleObj.title !== Article.title) {
+                if (title !== Article.title) {
+                    // add if statement for repeats
                     articleObj.save((err) => {
                         if (err) throw err;
                     })
-                }; 
-            };
-            
+                };
+            } else {
+                console.log('no')
+            }
+
         });
     });
     res.redirect('/newsarticles')
 });
 
-// save post
-
-app.put('/note/:id', (req, res) => {
-    console.log(req.body.noteText) // returns note
-    // let text = req.body.noteText
-
-    Article.update({ _id: req.params.id }, (err, data) => {
-        if (err) throw err;
-        console.log(data)
-    });
-    res.render('newsfeed')
-});
-
-
+// listening for connection
 app.listen(3000, (err) => {
     if (err) throw err;
     console.log('MongoDB Scrapper listening on Port 3000')
