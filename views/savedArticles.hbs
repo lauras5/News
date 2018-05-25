@@ -7,6 +7,7 @@
             <a id='btns' class="nav-link" href="/savedArticles">Saved Articles</a>
         </li>
     </ul>
+
     <div class="container">
         <div class="row">
             <div class="col-md">
@@ -15,26 +16,28 @@
                 </div>
             </div>
         </div>
+
         {{#each sarticle}}
-                <div id="news_each">
-                    <h3 id='title'>{{ title }}</h3>
-                    <p id='body'>{{body}}</p>
-                    <p id='author'>Written {{author}}</p>
+        <div id="news_each">
+            <h3 id='title'>{{ title }}</h3>
+            <p id='body'>{{body}}</p>
+            <p id='author'>Written {{author}}</p>
 
-                    <button id='linkBtn' class="btn btn-dark">
-                        <a id='btns' href={{url}} target='_blank'> GO TO ARTICLE </a>
-                    </button>
+            <button id='linkBtn' class="btn btn-dark">
+                <a id='btns' href='{{url}}' target='_blank'> GO TO ARTICLE </a>
+            </button>
 
-                    <button id='noteBtn' class="btn btn-dark">
-                        <a id='btns' href="/note/:" + {{this._id}}>Add a Comment</a>
-                    </button>
+            <button id='noteBtn' class="btn btn-dark">
+                <a id='btns' href="/note/:{{this._id}}">Add a Comment</a>
+            </button>
 
-                    <button id='saveBtn' class="btn btn-dark">
-                        <a id='btns' href='/note/:{{this._id}}'>Save This Article</a>
-                    </button>
-                </div>
-            {{/each}}
-        
+            <button id='saveBtn' class="btn btn-dark">
+                <a id='btns' href='/note/:{{this._id}}'>Save This Article</a>
+            </button>
+        </div>
+        {{/each}}
     </div>
 
+    <br>
+    <footer> &copy; Laura Salcido 2018</footer>
 </div>
