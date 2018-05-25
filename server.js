@@ -25,8 +25,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
 app.set("view engine", "hbs");
 
-// var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
-var MONGODB_URI = process.env.MONGODB_URI || 'mongodb://<dbuser>:<dbpassword>@ds135619.mlab.com:35619/heroku_vzk22r8w' || 'mongodb://localhost/newsdb'
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
+// var MONGODB_URI = process.env.MONGODB_URI || 'mongodb://<dbuser>:<dbpassword>@ds135619.mlab.com:35619/heroku_vzk22r8w' || 'mongodb://localhost/newsdb'
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
@@ -71,9 +71,15 @@ app.get('/savedArticles', (req, res) => {
 app.post('/saved/:id', (req, res) => {
     Article.update({ _id: req.params.id }, {saved : true}, (err, doc) =>{
         if (err) throw err
-        return res.send('successfully updated')
+        return res.redirect('/newsarticles')
     });
-    res.redirect('/savedArticles')
+})
+
+app.post('/unsaved/:id', (req, res) => {
+    Article.update({ _id: req.params.id }, {saved : false}, (err, doc) =>{
+        if (err) throw err
+        return res.redirect('/savedArticles')
+    });
 })
 
 

@@ -27,13 +27,19 @@
                 <a id='btns' href='{{url}}' target='_blank'> GO TO ARTICLE </a>
             </button>
 
-            <button id='noteBtn' class="btn btn-dark">
-                <a id='btns' href="/note/:{{this._id}}">Add a Comment</a>
-            </button>
+           <form id='saveForm' action="/unsaved/{{this._id}}" method='post'>
+            <input ID='saveBtn' class='btn btn-dark' type="submit" value='REMOVE SAVED ARTICLE'>
+            </form>
 
-            <button id='saveBtn' class="btn btn-dark">
-                <a id='btns' href='/note/:{{this._id}}'>Save This Article</a>
-            </button>
+            <form id='inputform' action='/note/{{this._id}}' method='post'>
+                Comment:
+                <input id='txtinput' type="text" name='noteText'/>
+                <input id='sbtinput' type='submit' value='submit'/>
+            </form>
+            <div class="myComments">
+                {{this._note}}
+            </div>
+            
         </div>
         {{/each}}
     </div>

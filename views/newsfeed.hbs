@@ -27,12 +27,9 @@
                 <a id='btns' href={{url}} target='_blank'> GO TO ARTICLE </a>
             </button>
 
-            <form action="/saved/{{this._id}}" method='post'>
-            <input type="submit" value='save'>
+            <form id='saveForm' action="/saved/{{this._id}}" method='post'>
+            <input ID='saveBtn' class='btn btn-dark' type="submit" value='SAVE ARTICLE'>
             </form>
-            {{!-- <button id='saveBtn' class="btn btn-dark">
-                <a id='btns' href='/saved/{{this._id}}'>Save This Article</a>
-            </button> --}}
 
             <form id='inputform' action='/note/{{this._id}}' method='post'>
                 Comment:
