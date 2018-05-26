@@ -5,26 +5,29 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-// const Article = require('./models/Article.js');
-// const Note = require('./models/Note.js');
 const db = require('./models')
+
+// initialize express
 const app = express();
+
 const Article = db.Article
 const Note = db.Note
 
-// initialize express
-
+// require request & cheerio for scraping
 const request = require('request');
 const cheerio = require('cheerio');
 
+const PORT = process.env.PORT || 3000
 // using morgan and body parser
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
 
+// set up handlebars, change extention name to hbs
 app.engine("hbs", exphbs({ defaultLayout: "main", extname: '.hbs' }));
 app.set("view engine", "hbs");
 
+// set up heroku
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
@@ -37,7 +40,7 @@ app.get('/', (req, res) => {
     res.render('index')
 });
 
-// sort by newest
+// renders all unsaved articles to the newsfeed
 app.get('/newsarticles', (req, res) => {
     Article.find({ saved: false }).then(function (r) {
         res.render('newsfeed', { article: r })
@@ -46,6 +49,8 @@ app.get('/newsarticles', (req, res) => {
     })
 })
 
+// finds all the articles that are saved
+// renders them to savedarticles 
 app.get('/savedArticles', (req, res) => {
     Article.find({ saved: true }).then(function (r) {
         res.render('savedArticles', { sarticle: r })
@@ -54,6 +59,7 @@ app.get('/savedArticles', (req, res) => {
     });
 });
 
+// changes saved boolean value to true
 app.post('/saved/:id', (req, res) => {
     Article.update({ _id: req.params.id }, { saved: true }, (err, doc) => {
         if (err) throw err
@@ -61,6 +67,7 @@ app.post('/saved/:id', (req, res) => {
     });
 })
 
+// changes saved boolean value to false 
 app.post('/unsaved/:id', (req, res) => {
     Article.update({ _id: req.params.id }, { saved: false }, (err, doc) => {
         if (err) throw err
@@ -68,9 +75,9 @@ app.post('/unsaved/:id', (req, res) => {
     });
 })
 
+// posts note to both note schema and article schema
 app.post('/note/:id', (req, res) => {
-    console.log(req.body.noteText) // returns note
-    // let text = req.body.noteText
+    // console.log(req.body.noteText) 
     const note = new Note({
         note: req.body.noteText
     });
@@ -79,15 +86,21 @@ app.post('/note/:id', (req, res) => {
         if (err) throw err
     })
 
+    // pushes note into Article's note objectid array
     Article.update({ _id: req.params.id }, {
         '$push': { note }
     }, (err, doc) => {
-        // console.log(doc)
         if (err) throw err;
         return res.redirect('/newsarticles')
     });
 });
 
+// // need to return comments and append to post
+// app.get('/note/:id', (req, res) => {
+//     Article.find({note : id}, (err, doc) => {
+//         res.redirect('/newsarticles')
+//     });
+// });
 
 app.post('/scrape', (req, res) => {
     const scrapedUrl = 'https://www.cnet.com/news/'
@@ -97,8 +110,6 @@ app.post('/scrape', (req, res) => {
 
         // always check for errors first
         if (err) throw err;
-
-        // let articleObj = [];
 
         const $ = cheerio.load(html);
 
@@ -111,33 +122,35 @@ app.post('/scrape', (req, res) => {
             const url = r.find('a').attr('href');
             const author = r.find('.assetAuthor').text()
 
+            console.log(Article)
             if (title && body && url && author) {
                 const articleObj = new Article({
                     title: title,
                     body: body,
-                    url: 'https://www.cnet.com/news' + url,
+                    url: 'https://www.cnet.com/' + url,
                     author: author,
                     saved: false
                 });
 
-                if (title !== Article.title) {
+                if (title === Article.title) {
                     // add if statement for repeats
                     articleObj.save((err) => {
                         if (err) throw err;
                     })
                 };
             } else {
-                console.log('no')
+                console.log('no title')
             }
 
         });
     });
+    // redirects to feed page on click
     res.redirect('/newsarticles')
 });
 
 // listening for connection
-app.listen(3000, (err) => {
+app.listen(PORT, (err) => {
     if (err) throw err;
-    console.log('MongoDB Scrapper listening on Port 3000')
+    console.log('MongoDB Scrapper listening on Port ' + PORT)
 });
 
