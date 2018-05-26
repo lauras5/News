@@ -29,6 +29,7 @@ app.set("view engine", "hbs");
 
 // set up heroku
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
+console.log(MONGODB_URI)
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 mongoose.Promise = Promise;
