@@ -18,6 +18,7 @@ const request = require('request');
 const cheerio = require('cheerio');
 
 const PORT = process.env.PORT || 3000
+
 // using morgan and body parser
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,8 +30,6 @@ app.set("view engine", "hbs");
 
 // set up heroku
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/newsdb";
-
-console.log(MONGODB_URI)
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 mongoose.Promise = Promise;
